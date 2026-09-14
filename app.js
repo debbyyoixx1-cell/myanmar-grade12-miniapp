@@ -2,6 +2,7 @@
 // Result data is served by the bot backend (CORS enabled).
 
 const API_BASES = [
+  "https://myanmar-exam-finder.lovable.app",
   "https://project--42619713-311d-4e79-bfaf-63b864bf09b4.lovable.app",
   "https://project--42619713-311d-4e79-bfaf-63b864bf09b4-dev.lovable.app",
 ];
