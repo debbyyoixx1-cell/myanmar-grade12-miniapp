@@ -9,12 +9,15 @@
     <meta property="og:description" content="ခုံအမှတ်ရိုက်ထည့်ပြီး အောင်စာရင်းကို ချက်ချင်းစစ်ဆေးပါ။" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
     <link rel="icon" href="assets/monywa-denstar-welcome.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="guard.js"></script>
   </head>
   <body>
     <div class="glow glow-a"></div>
@@ -24,13 +27,13 @@
       <!-- HOME -->
       <section class="screen" id="screen-home">
         <header class="hero">
-          <img class="hero-logo" src="assets/monywa-denstar-welcome.png" alt="Myanmar Grade 12 Bot" />
+          <img class="hero-logo" src="assets/monywa-denstar-welcome.png" alt="Myanmar Grade 12 Bot" draggable="false" />
           <h1>တက္ကသိုလ်ဝင်တန်း အောင်စာရင်း</h1>
           <p>ခုံအမှတ်ရိုက်ထည့်ရုံနှင့် အောင်/မအောင် ချက်ချင်းသိနိုင်ပါသည်။</p>
         </header>
 
         <div class="cards">
-          <button class="card" data-exam="matric">
+          <button class="card" type="button" data-exam="matric">
             <span class="card-ico">🎓</span>
             <span class="card-body">
               <strong>တက္ကသိုလ်ဝင်စာမေးပွဲ</strong>
@@ -38,7 +41,7 @@
             </span>
             <span class="card-arrow">›</span>
           </button>
-          <button class="card" data-exam="betal">
+          <button class="card" type="button" data-exam="betal">
             <span class="card-ico">🌾</span>
             <span class="card-body">
               <strong>စက်မှု၊ စိုက်ပျိုးရေး၊ မွေးမြူရေး</strong>
@@ -49,30 +52,30 @@
         </div>
 
         <nav class="links">
-          <a href="https://t.me/Myanmar_Grade12" target="_blank" rel="noopener">Support</a>
-          <a href="https://t.me/MyanmarGrade_12Bot" target="_blank" rel="noopener">Bot</a>
-          <a href="https://t.me/debby_yoixx" target="_blank" rel="noopener">Owner</a>
+          <button class="linkbtn" type="button" data-link="support">Support</button>
+          <button class="linkbtn" type="button" data-link="bot">Bot</button>
+          <button class="linkbtn" type="button" data-link="owner">Owner</button>
         </nav>
       </section>
 
       <!-- FORM -->
       <section class="screen hidden" id="screen-form">
-        <button class="back" id="btn-back">‹ နောက်သို့</button>
+        <button class="back" type="button" id="btn-back">‹ နောက်သို့</button>
         <h2 id="form-title">တက္ကသိုလ်ဝင်စာမေးပွဲ</h2>
 
         <label class="field">
           <span>ခုံအမှတ် (အက္ခရာ)</span>
-          <input id="in-alpha" list="alpha-list" autocomplete="off" placeholder="ဥပမာ - မနတ" />
+          <input id="in-alpha" list="alpha-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="ဥပမာ - မနတ" />
           <datalist id="alpha-list"></datalist>
         </label>
 
         <label class="field">
           <span>ခုံအမှတ် (ကိန်းဂဏန်း)</span>
-          <input id="in-roll" inputmode="numeric" autocomplete="off" placeholder="ဥပမာ - 125" />
+          <input id="in-roll" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="ဥပမာ - 125" />
         </label>
 
         <p class="hint" id="form-hint"></p>
-        <button class="primary" id="btn-check">စစ်ဆေးမည်</button>
+        <button class="primary" type="button" id="btn-check">စစ်ဆေးမည်</button>
       </section>
 
       <!-- SUSPENSE -->
@@ -84,18 +87,18 @@
 
       <!-- RESULT -->
       <section class="screen hidden" id="screen-result">
-        <img class="result-img" id="result-img" alt="result" />
+        <img class="result-img" id="result-img" alt="result" draggable="false" />
         <h2 id="result-title"></h2>
         <div class="rows" id="result-rows"></div>
-        <button class="primary" id="btn-again">ထပ်စစ်ဆေးမည်</button>
+        <button class="primary" type="button" id="btn-again">ထပ်စစ်ဆေးမည်</button>
         <nav class="links">
-          <a href="https://t.me/Myanmar_Grade12" target="_blank" rel="noopener">Support</a>
-          <a href="https://telegra.ph/" target="_blank" rel="noopener" id="link-help">Bot Help</a>
-          <a href="https://t.me/debby_yoixx" target="_blank" rel="noopener">Owner</a>
+          <button class="linkbtn" type="button" data-link="support">Support</button>
+          <button class="linkbtn" type="button" data-link="help">Bot Help</button>
+          <button class="linkbtn" type="button" data-link="owner">Owner</button>
         </nav>
       </section>
 
-      <footer class="foot">Data source: result.dme.gov.mm · Monywa DENSTAR</footer>
+      <footer class="foot">Monywa DENSTAR</footer>
     </main>
 
     <script src="app.js"></script>
