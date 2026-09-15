@@ -34,6 +34,29 @@ function haptic(type) {
   try { tg?.HapticFeedback?.notificationOccurred(type); } catch (_) {}
 }
 
+// --- links (kept out of the DOM so long-press never reveals a URL) ---------
+const LINKS = {
+  support: "https://t.me/Myanmar_Grade12",
+  bot: "https://t.me/MyanmarGrade_12Bot",
+  owner: "https://t.me/debby_yoixx",
+  help: "https://t.me/Myanmar_Grade12",
+};
+
+function openLink(key) {
+  const url = LINKS[key];
+  if (!url) return;
+  try {
+    if (tg?.openTelegramLink) return tg.openTelegramLink(url);
+    if (tg?.openLink) return tg.openLink(url);
+  } catch (_) {}
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest?.("[data-link]");
+  if (btn) openLink(btn.dataset.link);
+});
+
 async function apiGet(params) {
   let lastErr;
   for (const base of API_BASES) {
@@ -87,8 +110,13 @@ async function suspense() {
   }
 }
 
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
 function rowHtml(label, value) {
-  return `<div class="row"><span>${label}</span><strong>${value}</strong></div>`;
+  return `<div class="row"><span>${esc(label)}</span><strong data-selectable>${esc(value)}</strong></div>`;
 }
 
 function renderResult(data) {
