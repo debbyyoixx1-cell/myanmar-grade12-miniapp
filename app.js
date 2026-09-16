@@ -119,7 +119,81 @@ function rowHtml(label, value) {
   return `<div class="row"><span>${esc(label)}</span><strong data-selectable>${esc(value)}</strong></div>`;
 }
 
+// --- share ----------------------------------------------------------------
+const MINIAPP_URL = "https://t.me/MyanmarGrade_12Bot/MyanmarGrade12Bot";
+let lastResult = null;
+
+function assetUrl(file) {
+  return new URL(`assets/${file}`, window.location.href).href;
+}
+
+function shareQuery(d) {
+  return [
+    "res",
+    d.found ? "1" : "0",
+    d.rollDisplay ?? "",
+    d.found ? (d.name ?? "") : "",
+    d.found ? (d.distinction ?? "") : "",
+    d.found && d.exam === "betal" ? (d.grade ?? "") : "",
+    d.found && d.exam === "betal" ? (d.designation ?? "") : "",
+  ]
+    .join("~")
+    .replace(/\n/g, " ")
+    .slice(0, 250);
+}
+
+function shareText(d) {
+  if (!d.found) {
+    return `❌ အောင်စာရင်းတွင်ရှာမတွေ့ပါ။\nခုံအမှတ် - ${d.rollDisplay}`;
+  }
+  let t = `✅ အောင်မြင်ပါသည်။\nခုံအမှတ် - ${d.rollDisplay}\nအမည် - ${d.name}\nဂုဏ်ထူး - ${d.distinction}`;
+  if (d.exam === "betal") {
+    t += `\nအဆင့် - ${d.grade || "မရှိပါ။"}\nသတ်မှတ်ချက် - ${d.designation || "မရှိပါ။"}`;
+  }
+  return t;
+}
+
+function shareStory() {
+  const d = lastResult;
+  const hint = $("share-hint");
+  if (!d) return;
+  const media = assetUrl(d.found ? "success.jpg" : "notfound.jpg");
+  try {
+    if (typeof tg?.shareToStory === "function") {
+      tg.shareToStory(media, {
+        text: `${shareText(d)}\n\n👇 သင်လည်း ခုံအမှတ်ဖြင့် စစ်ဆေးနိုင်ပါသည်။`,
+        widget_link: { url: MINIAPP_URL, name: "အောင်စာရင်း စစ်ဆေးမည်" },
+      });
+      hint.textContent = "Story တင်ရန် ဖွင့်ပေးလိုက်ပါပြီ။";
+      return;
+    }
+  } catch (_) {}
+  hint.textContent = "Story Share အတွက် Telegram ကို Update လုပ်ပါ။";
+}
+
+function shareFriend() {
+  const d = lastResult;
+  const hint = $("share-hint");
+  if (!d) return;
+  try {
+    if (typeof tg?.switchInlineQuery === "function") {
+      tg.switchInlineQuery(shareQuery(d), ["users", "groups", "channels"]);
+      return;
+    }
+  } catch (_) {}
+  hint.textContent = "Bot ထဲမှ Mini App ကို ဖွင့်ပြီး ပြန်ကြိုးစားပါ။";
+}
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest?.("[data-share]");
+  if (!btn) return;
+  if (btn.dataset.share === "story") shareStory();
+  else shareFriend();
+});
+
 function renderResult(data) {
+  lastResult = data;
+  $("share-hint").textContent = "";
   const img = $("result-img");
   if (data.found) {
     img.src = "assets/success.png";
