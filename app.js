@@ -161,10 +161,10 @@ function shareStory() {
   try {
     if (typeof tg?.shareToStory === "function") {
       tg.shareToStory(media, {
-        text: `${shareText(d)}\n\n👇 သင်လည်း ခုံအမှတ်ဖြင့် စစ်ဆေးနိုင်ပါသည်။`,
-        widget_link: { url: MINIAPP_URL, name: "အောင်စာရင်း စစ်ဆေးမည်" },
+        text: `${shareText(d)}\n\n👇 ခုံအမှတ်ဖြင့် ကိုယ်တိုင်စစ်ဆေးနိုင်ပါသည်။\n${MINIAPP_URL}`,
+        widget_link: { url: MINIAPP_URL, name: "🎓 အောင်စာရင်း စစ်ဆေးမည်" },
       });
-      hint.textContent = "Story တင်ရန် ဖွင့်ပေးလိုက်ပါပြီ။";
+      hint.textContent = "";
       return;
     }
   } catch (_) {}
@@ -176,12 +176,22 @@ function shareFriend() {
   const hint = $("share-hint");
   if (!d) return;
   try {
-    if (typeof tg?.switchInlineQuery === "function") {
+    const supported =
+      typeof tg?.switchInlineQuery === "function" &&
+      (typeof tg?.isVersionAtLeast !== "function" || tg.isVersionAtLeast("6.7"));
+    if (supported) {
       tg.switchInlineQuery(shareQuery(d), ["users", "groups", "channels"]);
+      hint.textContent = "Friend ကိုရွေးပြီး ပေါ်လာတဲ့ပုံကို နှိပ်ပြီး ပို့ပါ။";
       return;
     }
   } catch (_) {}
-  hint.textContent = "Bot ထဲမှ Mini App ကို ဖွင့်ပြီး ပြန်ကြိုးစားပါ။";
+  // Fallback: Telegram share picker (text + Mini App link)
+  const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(MINIAPP_URL)}&text=${encodeURIComponent(shareText(d))}`;
+  try {
+    if (tg?.openTelegramLink) return tg.openTelegramLink(shareUrl);
+    if (tg?.openLink) return tg.openLink(shareUrl);
+  } catch (_) {}
+  window.open(shareUrl, "_blank", "noopener,noreferrer");
 }
 
 document.addEventListener("click", (e) => {
