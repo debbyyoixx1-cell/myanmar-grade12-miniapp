@@ -153,6 +153,25 @@ function shareText(d) {
   return t;
 }
 
+async function prepareShareMessage(d) {
+  let lastError;
+  for (const base of API_BASES) {
+    try {
+      const response = await fetch(`${base}/api/public/telegram/prepare-share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg?.initData || "", result: d }),
+      });
+      const data = await response.json();
+      if (response.ok && data?.id) return data.id;
+      lastError = new Error(data?.error || "share_unavailable");
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("share_unavailable");
+}
+
 function shareStory() {
   const d = lastResult;
   const hint = $("share-hint");
@@ -171,21 +190,26 @@ function shareStory() {
   hint.textContent = "Story Share အတွက် Telegram ကို Update လုပ်ပါ။";
 }
 
-function shareFriend() {
+async function shareFriend() {
   const d = lastResult;
   const hint = $("share-hint");
   if (!d) return;
   try {
-    const supported =
-      typeof tg?.switchInlineQuery === "function" &&
-      (typeof tg?.isVersionAtLeast !== "function" || tg.isVersionAtLeast("6.7"));
-    if (supported) {
-      tg.switchInlineQuery(shareQuery(d), ["users", "groups", "channels"]);
-      hint.textContent = "Friend ကိုရွေးပြီး ပေါ်လာတဲ့ပုံကို နှိပ်ပြီး ပို့ပါ။";
+    const supportsPreparedShare =
+      typeof tg?.shareMessage === "function" &&
+      (typeof tg?.isVersionAtLeast !== "function" || tg.isVersionAtLeast("8.0"));
+    if (supportsPreparedShare && tg?.initData) {
+      hint.textContent = "မျှဝေရန် ပြင်ဆင်နေပါသည်...";
+      const preparedMessageId = await prepareShareMessage(d);
+      tg.shareMessage(preparedMessageId, (sent) => {
+        hint.textContent = sent === false ? "မျှဝေခြင်းကို ပယ်ဖျက်ထားပါသည်။" : "";
+      });
       return;
     }
   } catch (_) {}
-  // Fallback: Telegram share picker (text + Mini App link)
+
+  // Older Telegram versions: share text and the Mini App link.
+  hint.textContent = "";
   const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(MINIAPP_URL)}&text=${encodeURIComponent(shareText(d))}`;
   try {
     if (tg?.openTelegramLink) return tg.openTelegramLink(shareUrl);
