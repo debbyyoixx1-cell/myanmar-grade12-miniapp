@@ -24,6 +24,18 @@ const screens = {
 };
 
 let exam = "matric";
+let officialYear = "၂၀၂၆";
+
+function updateYearCopy(year) {
+  if (!year) return;
+  officialYear = year;
+  const title = $("page-title");
+  const matricLabel = $("matric-label");
+  if (title) title.textContent = `${officialYear} တက္ကသိုလ်ဝင်တန်း အောင်စာရင်း`;
+  if (matricLabel) matricLabel.textContent = `${officialYear} ခုနှစ်၊ တက္ကသိုလ်ဝင်စာမေးပွဲ အောင်စာရင်း`;
+  if (exam === "matric") $("form-title").textContent = `${officialYear} ခုနှစ်၊ တက္ကသိုလ်ဝင်စာမေးပွဲ အောင်စာရင်း`;
+  document.title = `${officialYear} တက္ကသိုလ်ဝင်တန်း အောင်စာရင်း | Myanmar Grade 12`;
+}
 
 function show(name) {
   Object.entries(screens).forEach(([k, el]) => el.classList.toggle("hidden", k !== name));
@@ -33,29 +45,6 @@ function show(name) {
 function haptic(type) {
   try { tg?.HapticFeedback?.notificationOccurred(type); } catch (_) {}
 }
-
-// --- links (kept out of the DOM so long-press never reveals a URL) ---------
-const LINKS = {
-  support: "https://t.me/Myanmar_Grade12",
-  bot: "https://t.me/MyanmarGrade_12Bot",
-  owner: "https://t.me/debby_yoixx",
-  help: "https://t.me/Myanmar_Grade12",
-};
-
-function openLink(key) {
-  const url = LINKS[key];
-  if (!url) return;
-  try {
-    if (tg?.openTelegramLink) return tg.openTelegramLink(url);
-    if (tg?.openLink) return tg.openLink(url);
-  } catch (_) {}
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest?.("[data-link]");
-  if (btn) openLink(btn.dataset.link);
-});
 
 async function apiGet(params) {
   let lastErr;
@@ -73,10 +62,23 @@ async function apiGet(params) {
 
 // --- alpha suggestions -----------------------------------------------------
 async function loadAlphas() {
+  const requestedExam = exam;
   try {
-    const data = await apiGet({ exam, list: "1" });
+    const data = await apiGet({ exam: requestedExam, list: "1" });
     if (!data?.alphas) return;
+    if (requestedExam === "matric" && data.year) updateYearCopy(data.year);
+    if (requestedExam !== exam) return;
     $("alpha-list").innerHTML = data.alphas.map((a) => `<option value="${a}"></option>`).join("");
+  } catch (_) {}
+}
+
+async function loadOfficialYear() {
+  try {
+    const response = await fetch("https://result.dme.gov.mm/matric/");
+    if (!response.ok) return;
+    const html = await response.text();
+    const year = html.match(/<title[^>]*>\s*([၀-၉]{4})\s*ခုနှစ်/i)?.[1];
+    if (year) updateYearCopy(year);
   } catch (_) {}
 }
 
@@ -85,7 +87,7 @@ document.querySelectorAll(".card").forEach((btn) => {
   btn.addEventListener("click", () => {
     exam = btn.dataset.exam;
     $("form-title").textContent =
-      exam === "matric" ? "တက္ကသိုလ်ဝင်စာမေးပွဲ" : "စက်မှု၊ စိုက်ပျိုးရေး၊ မွေးမြူရေး";
+      exam === "matric" ? `${officialYear} ခုနှစ်၊ တက္ကသိုလ်ဝင်စာမေးပွဲ အောင်စာရင်း` : "စက်မှု၊ စိုက်ပျိုးရေး၊ မွေးမြူရေး";
     $("in-alpha").placeholder = exam === "matric" ? "ဥပမာ - မနတ" : "ဥပမာ - မကတ(B)";
     $("in-alpha").value = "";
     $("in-roll").value = "";
@@ -283,3 +285,6 @@ $("btn-check").addEventListener("click", async () => {
 $("in-roll").addEventListener("keydown", (e) => {
   if (e.key === "Enter") $("btn-check").click();
 });
+
+loadAlphas();
+loadOfficialYear();
