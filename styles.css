@@ -147,4 +147,4 @@ h2 { font-size: 21px; margin: 0 0 18px; }
 }
 .links .linkbtn:active { transform: scale(.985); border-color: rgba(47, 123, 255, .6); }
 
-.foot { margin-top: auto; padding-top: 26px; text-align: center; font-size: 12px; color: rgba(159, 178, 212, .7); }
+.foot { margin-top: auto; padding-top: 26px; text-align: center; font-size: 12px; line-height: 1.8; color: rgba(159, 178, 212, .7); }
