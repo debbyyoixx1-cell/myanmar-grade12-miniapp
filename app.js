@@ -122,7 +122,7 @@ function rowHtml(label, value) {
 }
 
 // --- share ----------------------------------------------------------------
-const MINIAPP_URL = "https://t.me/MyanmarGrade_12Bot/MyanmarGrade12Bot";
+const MINIAPP_URL = "https://t.me/Myanmar_Grade12Bot/MyanmarGrade12Bot";
 let lastResult = null;
 
 function assetUrl(file) {
