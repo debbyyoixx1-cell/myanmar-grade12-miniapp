@@ -178,7 +178,8 @@ function shareStory() {
   const d = lastResult;
   const hint = $("share-hint");
   if (!d) return;
-  const media = assetUrl(d.found ? "success.jpg" : "notfound.jpg");
+  const media = d.found ? d.photoUrl : assetUrl("notfound.jpg");
+  if (!media) return;
   try {
     if (typeof tg?.shareToStory === "function") {
       tg.shareToStory(media, {
@@ -232,7 +233,7 @@ function renderResult(data) {
   $("share-hint").textContent = "";
   const img = $("result-img");
   if (data.found) {
-    img.src = "assets/success.png";
+    img.src = data.photoUrl;
     $("result-title").innerHTML = '<span class="ok">✅ အောင်မြင်ပါသည်။</span>';
     let html = rowHtml("ခုံအမှတ်", data.rollDisplay) + rowHtml("အမည်", data.name) + rowHtml("ဂုဏ်ထူး", data.distinction);
     if (data.exam === "betal") {
